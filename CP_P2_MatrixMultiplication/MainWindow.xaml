@@ -1,0 +1,26 @@
+﻿<Window x:Class="CP_P2_MatrixMultiplication.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CP_P2_MatrixMultiplication"
+        mc:Ignorable="d"
+        Title="Multiplicacion de Matrices" Height="350" Width="525">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="btnNewMatrices"  Content="Renovar Matrices" Width="100" 
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Click="btnNewMatrices_Click"/>
+        </Grid>
+    </Grid>
+</Window>
