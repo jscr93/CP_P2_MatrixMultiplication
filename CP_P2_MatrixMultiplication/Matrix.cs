@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Threading;
 
 namespace CP_P2_MatrixMultiplication
 {
@@ -74,6 +75,75 @@ namespace CP_P2_MatrixMultiplication
                 }
             }
             File.Delete(m2_path);
+        }
+
+        private class RowResult
+        {
+            public string row;
+            public long rowNumber;
+        }
+
+        private static readonly object syncLock = new object();
+        private static List<RowResult> MatrixResult;
+
+        public static void multiplicationParallel(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator)
+        {
+            File.Delete(path_result);
+            string m1_path = path1;
+            string m2_path = transpose(path2, columns_m1, rows_m1, separator);
+            MatrixResult = new List<RowResult>();
+            Task[] mTasks = new Task[rows_m1];
+            for( int i = 0; i < rows_m1; i++)
+            {
+                int a = i;
+                mTasks[a] = new Task(() => executeRowMultiplication(m1_path, m2_path, path_result, rows_m1, columns_m1, separator, a));
+            }
+
+            foreach (Task t in mTasks)
+                t.Start();
+
+            Task.WaitAll(mTasks);
+
+
+            RowResult[] sortedMatrix = MatrixResult.OrderBy(s => s.rowNumber).ToArray();
+            using (StreamWriter sw = File.CreateText(path_result))
+            {
+                for (int i = 0; i < sortedMatrix.Length; i++)
+                {
+                    sw.WriteLine(sortedMatrix[i].row);
+                }
+            }
+            File.Delete(m2_path);
+            //string line = File.ReadLines(path1).Skip(2).Take(1).First();
+        }
+
+        private static void executeRowMultiplication(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator, int rowIndex_m1)
+        {
+            RowResult rowResult = new RowResult();
+            string matrix1_row = File.ReadLines(path1).Skip(rowIndex_m1).Take(1).First();
+            var m1_rowElements = matrix1_row.Split(separator).Select(Int32.Parse).ToArray();
+            StringBuilder sbRowResult = new StringBuilder();
+            using (StreamReader sr2 = File.OpenText(path2))
+            {
+                for (int i_m2 = 0; i_m2 < rows_m1; i_m2++)
+                {
+                    string matrix2_row = sr2.ReadLine();
+                    var m2_rowElements = matrix2_row.Split(separator).Select(Int32.Parse).ToArray();
+                    int mr_element = 0;
+                    for (int j = 0; j < columns_m1; j++)
+                    {
+                        mr_element += m1_rowElements[j] * m2_rowElements[j];
+                    }
+                    sbRowResult.Append(mr_element);
+                    sbRowResult.Append(separator);
+                }
+            }
+            sbRowResult.Length -= 1;
+            rowResult.row = sbRowResult.ToString();
+            rowResult.rowNumber = rowIndex_m1;
+            lock (syncLock) {
+                MatrixResult.Add(rowResult);
+            } 
         }
 
         private static string transpose(string path_source, long rows, long columns, char separator)

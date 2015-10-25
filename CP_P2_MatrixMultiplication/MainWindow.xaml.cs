@@ -48,6 +48,10 @@ namespace CP_P2_MatrixMultiplication
                     txtColumns.Text = sr.ReadLine();
                     txtSeedM1.Text = sr.ReadLine();
                     txtSeedM2.Text = sr.ReadLine();
+                    Int32.TryParse(txtRows.Text, out rows);
+                    Int32.TryParse(txtColumns.Text, out columns);
+                    Int32.TryParse(txtSeedM1.Text, out seed1);
+                    Int32.TryParse(txtSeedM2.Text, out seed2);
                 }
             }
             else
@@ -93,6 +97,19 @@ namespace CP_P2_MatrixMultiplication
             else
             {
                 MessageBox.Show("Los valores ingresados deben ser enteros", "No se ha podido realizar la operación", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
+        }
+
+        private void btnParallel_Click(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists(path1) && File.Exists(path2))
+            {
+                Matrix.multiplicationParallel(path1, path2, path_result, rows, columns, separator);
+                MessageBox.Show("Se ha concluido la operación.", "Operación completa", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("No se han generado las matrices", "No se ha podido realizar la operación", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
 

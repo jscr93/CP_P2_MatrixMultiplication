@@ -54,7 +54,7 @@
             </Button>
 
             <Button x:Name="btnParallel"  Width="100" Height="50"
-                    HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2">
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2" Click="btnParallel_Click">
                 <TextBlock TextWrapping="Wrap" TextAlignment="Center">Multiplicar Paralelamente</TextBlock>
             </Button>
 
