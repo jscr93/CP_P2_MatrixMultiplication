@@ -21,27 +21,79 @@ namespace CP_P2_MatrixMultiplication
     /// </summary>
     public partial class MainWindow : Window
     {
+        string path1, path2;
+        string path_result;
+        string path_config;
+        string directory;
+        char separator;
+
+        int rows, columns;
+        int seed1, seed2;
+
         public MainWindow()
         {
             InitializeComponent();
-            string path1 = @"C:\Users\Saul Chavez\Documents\Matrix_1.txt";
-            string path2 = @"C:\Users\Saul Chavez\Documents\Matrix_2.txt";
-            string path_result = @"C:\Users\Saul Chavez\Documents\Matrix_Result.txt";
-            char separator = ',';
-            Matrix.multiplicationSequential(path1, path2, path_result, 6, 3, separator);
+            path1 = @"C:\CP_P2\Matrix_1.txt";
+            path2 = @"C:\CP_P2\Matrix_2.txt";
+            path_result = @"C:\CP_P2\Matrix_Result.txt";
+            path_config = @"C:\CP_P2\Matrix_Config.txt";
+            separator = ',';
+            directory = @"C:\CP_P2";
+            System.IO.Directory.CreateDirectory(directory);
+            if(File.Exists(path_config))
+            {
+                using (StreamReader sr = File.OpenText(path_config))
+                {
+                    txtRows.Text = sr.ReadLine();
+                    txtColumns.Text = sr.ReadLine();
+                    txtSeedM1.Text = sr.ReadLine();
+                    txtSeedM2.Text = sr.ReadLine();
+                }
+            }
+            else
+            {
+                rows = 6;
+                columns = 3;
+                seed1 = 2;
+                seed2 = 3;
+                txtRows.Text = rows.ToString();
+                txtColumns.Text = columns.ToString();
+                txtSeedM1.Text = seed1.ToString();
+                txtSeedM2.Text = seed2.ToString();
+            }
         }
 
         private void btnNewMatrices_Click(object sender, RoutedEventArgs e)
         {
-            string path1 = @"C:\Users\Saul Chavez\Documents\Matrix_1.txt";
-            string path2 = @"C:\Users\Saul Chavez\Documents\Matrix_2.txt";
-            char separator = ',';
-            DisableAll();
-            File.Delete(path1);
-            File.Delete(path2);
-            Matrix.createMatrixFile(path1, 6, 3, separator,2);
-            Matrix.createMatrixFile(path2, 3, 6, separator,3);
-            EnableAll();
+            int rows, columns, seed1, seed2;
+            if (int.TryParse(txtRows.Text, out rows) && int.TryParse(txtColumns.Text, out columns) 
+                && int.TryParse(txtSeedM1.Text, out seed1) && int.TryParse(txtSeedM2.Text, out seed2))
+            {
+                char separator = ',';
+                DisableAll();
+                File.Delete(path1);
+                File.Delete(path2);
+                Matrix.createMatrixFile(path1, rows, columns, separator, seed1);
+                Matrix.createMatrixFile(path2, columns, rows, separator, seed2);
+                EnableAll();
+                File.Delete(path_config);
+                using (StreamWriter sw = File.CreateText(path_config))
+                {
+                    sw.WriteLine(rows);
+                    sw.WriteLine(columns);
+                    sw.WriteLine(seed1);
+                    sw.WriteLine(seed2);
+                    this.rows = rows;
+                    this.columns = columns;
+                    this.seed1 = seed1;
+                    this.seed2 = seed2;
+                }
+                MessageBox.Show("Se han creado las matrices exitosamente.", "Se han creado las matrices", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Los valores ingresados deben ser enteros", "No se ha podido realizar la operación", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
 
         private void DisableAll()
@@ -52,6 +104,19 @@ namespace CP_P2_MatrixMultiplication
         private void EnableAll()
         {
             btnNewMatrices.IsEnabled = true;
+        }
+
+        private void btnSequential_Click(object sender, RoutedEventArgs e)
+        {
+            if (File.Exists(path1) && File.Exists(path2))
+            {
+                Matrix.multiplicationSequential(path1, path2, path_result, rows, columns, separator);
+                MessageBox.Show("Se ha concluido la operación.", "Operación completa", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("No se han generado las matrices", "No se ha podido realizar la operación", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            }
         }
     }
 }

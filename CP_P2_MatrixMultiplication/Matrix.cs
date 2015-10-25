@@ -41,73 +41,73 @@ namespace CP_P2_MatrixMultiplication
             string m1_path = path1;
             string m2_path = transpose(path2, columns_m1, rows_m1, separator);
 
-            File.Delete(path_result);
-
-            if (!File.Exists(path_result))
+            File.Delete(path_result);            
+            using (StreamReader sr1 = File.OpenText(m1_path))
             {
-                using (StreamReader sr1 = File.OpenText(m1_path), sr2 = File.OpenText(m2_path))
+                using (StreamWriter sw = File.CreateText(path_result))
                 {
-                    using (StreamWriter sw = File.CreateText(path_result))
+                    for (int i = 0; i < rows_m1; i++)
                     {
-                        for (int i = 0; i < rows_m1; i++)
+                        string matrix1_row = sr1.ReadLine();
+                        
+                        var m1_rowElements = matrix1_row.Split(separator).Select(Int32.Parse).ToArray();
+                        
+                        StringBuilder mr_row = new StringBuilder();
+                        using (StreamReader sr2 = File.OpenText(m2_path))
                         {
-                            string matrix1_row = sr1.ReadLine();
-                            string matrix2_row = sr2.ReadLine();
-                            var m1_rowElements = matrix1_row.Split(separator).Select(Int32.Parse).ToArray();
-                            var m2_rowElements = matrix2_row.Split(separator).Select(Int32.Parse).ToArray();
-                            StringBuilder mr_row = new StringBuilder();
-                            for (int j = 0; j < columns_m1; j++)
+                            for (int i_m2 = 0; i_m2 < rows_m1; i_m2++)
                             {
-                                int mr_element = m1_rowElements[j] * m2_rowElements[j];
+                                string matrix2_row = sr2.ReadLine();
+                                var m2_rowElements = matrix2_row.Split(separator).Select(Int32.Parse).ToArray();
+                                int mr_element = 0;
+                                for (int j = 0; j < columns_m1; j++)
+                                {
+                                    mr_element += m1_rowElements[j] * m2_rowElements[j];
+                                }
                                 mr_row.Append(mr_element);
                                 mr_row.Append(separator);
                             }
-                            sw.WriteLine(mr_row);
                         }
+                        mr_row.Length -= 1;
+                        sw.WriteLine(mr_row);
                     }
                 }
             }
+            File.Delete(m2_path);
         }
 
         private static string transpose(string path_source, long rows, long columns, char separator)
         {
-            string path_temp = @"C:\Users\Saul Chavez\Documents\Matrix_temp1.txt";
+            string path_temp = @"C:\CP_P2\Matrix_temp1.txt";
             File.Delete(path_temp);
-            if (!File.Exists(path_temp))
+            using (StreamReader sr = File.OpenText(path_source))
             {
-                using (StreamReader sr = File.OpenText(path_source))
+                //Inizialite StringBuilder array
+                StringBuilder[] sbTempFile = new StringBuilder[columns];
+                for (int i = 0; i < columns; i++)
+                    sbTempFile[i] = new StringBuilder();
+
+                //Retrieving lines of source file. Each line will append a new number to each StringBuilder array element
+                string source_line = "";
+                while ((source_line = sr.ReadLine()) != null)
                 {
-                    //Inizialite StringBuilder array
-                    StringBuilder[] sbTempFile = new StringBuilder[columns];
+                    string[] split_Line = source_line.Split(separator);
                     for (int i = 0; i < columns; i++)
-                        sbTempFile[i] = new StringBuilder();
-
-                    //Retrieving lines of source file. Each line will append a new number to each StringBuilder array element
-                    string source_line = "";
-                    while ((source_line = sr.ReadLine()) != null)
                     {
-                        string[] split_Line = source_line.Split(separator);
-                        for (int i = 0; i < columns; i++)
-                        {
-                            sbTempFile[i].Append(split_Line[i]);
-                            sbTempFile[i].Append(separator);
-                        }
-                    }
-
-                    using (StreamWriter sw = File.CreateText(path_temp))
-                    {
-                        for (int i = 0; i < columns; i++)
-                        {
-                            sbTempFile[i].Length -= 1;
-                            sw.WriteLine(sbTempFile[i]);
-                            sbTempFile[i] = null;
-                        }
+                        sbTempFile[i].Append(split_Line[i]);
+                        sbTempFile[i].Append(separator);
                     }
                 }
-            }
-            else
-            {
-                path_temp = null;
+
+                using (StreamWriter sw = File.CreateText(path_temp))
+                {
+                    for (int i = 0; i < columns; i++)
+                    {
+                        sbTempFile[i].Length -= 1;
+                        sw.WriteLine(sbTempFile[i]);
+                        sbTempFile[i] = null;
+                    }
+                }
             }
             return path_temp;
         }
