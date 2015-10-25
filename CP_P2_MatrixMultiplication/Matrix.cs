@@ -10,13 +10,13 @@ namespace CP_P2_MatrixMultiplication
     class Matrix
     {
 
-        public static void createMatrixFile(string path, long rows, long columns, char separator)
+        public static void createMatrixFile(string path, long rows, long columns, char separator, int randomSeed)
         {
             if (!File.Exists(path))
             {
                 using (StreamWriter sw = File.CreateText(path))
                 {
-                    Random rnd = new Random();
+                    Random rnd = new Random(randomSeed);
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < rows; i++)
                     {
@@ -36,59 +36,43 @@ namespace CP_P2_MatrixMultiplication
         }
 
 
-        public static void multiplicationSequential(string path1, string path2, long rows_m1, long columns_m1, char separator)
+        public static void multiplicationSequential(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator)
         {
             string m1_path = path1;
             string m2_path = transpose(path2, columns_m1, rows_m1, separator);
 
-            //using (StreamReader sr1 = File.OpenText(path1), sr2 = File.OpenText(path2))
-            //{
+            File.Delete(path_result);
 
-            //}
-        }
-
-        /*private static string transpose (string path_source, long rows, long columns, char separator)
-        {
-            string path_temp1 = @"C:\Users\Saul Chavez\Documents\Matrix_temp1.txt";
-            string path_temp2 = @"C:\Users\Saul Chavez\Documents\Matrix_temp2.txt";
-
-            int strBufferSize = 500;
-            string[] strBuffer = new string[strBufferSize];
-
-            bool temp2_empty = true;
-            if (!File.Exists(path_temp1) && !File.Exists(path_temp2))
+            if (!File.Exists(path_result))
             {
-                using (StreamReader sr = File.OpenText(path_source))
+                using (StreamReader sr1 = File.OpenText(m1_path), sr2 = File.OpenText(m2_path))
                 {
-                    using (StreamWriter sw1 = File.CreateText(path_temp1), sw2 = File.CreateText(path_temp2))
+                    using (StreamWriter sw = File.CreateText(path_result))
                     {
-                        StreamWriter active_sw = sw1;
-                        StreamWriter inactive_sw = sw2;
-                        string row_source = "";
-                        int strBufferIndex = 0;
-                        while ((row_source = sr.ReadLine()) != null)
+                        for (int i = 0; i < rows_m1; i++)
                         {
-                            if (strBufferIndex >= strBufferSize)
+                            string matrix1_row = sr1.ReadLine();
+                            string matrix2_row = sr2.ReadLine();
+                            var m1_rowElements = matrix1_row.Split(separator).Select(Int32.Parse).ToArray();
+                            var m2_rowElements = matrix2_row.Split(separator).Select(Int32.Parse).ToArray();
+                            StringBuilder mr_row = new StringBuilder();
+                            for (int j = 0; j < columns_m1; j++)
                             {
-                                List<string> copiedFile = new List<string>();
-                                if (!temp2_empty)
-                                {
-
-                                }
-                                Array.Clear(strBuffer, 0, strBuffer.Length);
-                                strBufferIndex = 0;
+                                int mr_element = m1_rowElements[j] * m2_rowElements[j];
+                                mr_row.Append(mr_element);
+                                mr_row.Append(separator);
                             }
-                            strBuffer[strBufferIndex++] = row_source;
+                            sw.WriteLine(mr_row);
                         }
                     }
                 }
             }
-            return path_temp1;
-        }*/
+        }
 
         private static string transpose(string path_source, long rows, long columns, char separator)
         {
             string path_temp = @"C:\Users\Saul Chavez\Documents\Matrix_temp1.txt";
+            File.Delete(path_temp);
             if (!File.Exists(path_temp))
             {
                 using (StreamReader sr = File.OpenText(path_source))
@@ -114,6 +98,7 @@ namespace CP_P2_MatrixMultiplication
                     {
                         for (int i = 0; i < columns; i++)
                         {
+                            sbTempFile[i].Length -= 1;
                             sw.WriteLine(sbTempFile[i]);
                             sbTempFile[i] = null;
                         }

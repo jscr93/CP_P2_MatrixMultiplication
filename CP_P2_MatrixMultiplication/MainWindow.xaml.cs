@@ -24,24 +24,11 @@ namespace CP_P2_MatrixMultiplication
         public MainWindow()
         {
             InitializeComponent();
-            //string path = @"C:\Users\Saul Chavez\Documents\Matrix_1.txt";
-            //using (StreamReader sr = File.OpenText(path))
-            //{
-            //    string s = "";
-            //    StringBuilder[] strArray = new StringBuilder[10000];
-            //    int i = 0;
-            //    while ((s = sr.ReadLine()) != null)
-            //    {
-            //        strArray[i] = new StringBuilder();
-            //        strArray[i].Append(s);
-            //        i++;
-            //    }
-            //    int a = 0;
-            //}
             string path1 = @"C:\Users\Saul Chavez\Documents\Matrix_1.txt";
             string path2 = @"C:\Users\Saul Chavez\Documents\Matrix_2.txt";
+            string path_result = @"C:\Users\Saul Chavez\Documents\Matrix_Result.txt";
             char separator = ',';
-            Matrix.multiplicationSequential(path1, path2, 10000, 5000, separator);
+            Matrix.multiplicationSequential(path1, path2, path_result, 6, 3, separator);
         }
 
         private void btnNewMatrices_Click(object sender, RoutedEventArgs e)
@@ -52,8 +39,8 @@ namespace CP_P2_MatrixMultiplication
             DisableAll();
             File.Delete(path1);
             File.Delete(path2);
-            Matrix.createMatrixFile(path1, 10000, 5000, separator);
-            Matrix.createMatrixFile(path2, 5000, 10000, separator);
+            Matrix.createMatrixFile(path1, 6, 3, separator,2);
+            Matrix.createMatrixFile(path2, 3, 6, separator,3);
             EnableAll();
         }
 
