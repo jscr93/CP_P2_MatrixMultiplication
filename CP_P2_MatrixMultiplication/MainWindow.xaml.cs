@@ -104,8 +104,8 @@ namespace CP_P2_MatrixMultiplication
         {
             if (File.Exists(path1) && File.Exists(path2))
             {
-                Matrix.multiplicationParallel(path1, path2, path_result, rows, columns, separator);
-                MessageBox.Show("Se ha concluido la operación.", "Operación completa", MessageBoxButton.OK, MessageBoxImage.Information);
+                long elapsedTime = Matrix.multiplicationParallel(path1, path2, path_result, rows, columns, separator);
+                MessageBox.Show(string.Format("Se ha concluido la operación en {0} milisegundos.", elapsedTime), "Operación completa", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
@@ -127,8 +127,8 @@ namespace CP_P2_MatrixMultiplication
         {
             if (File.Exists(path1) && File.Exists(path2))
             {
-                Matrix.multiplicationSequential(path1, path2, path_result, rows, columns, separator);
-                MessageBox.Show("Se ha concluido la operación.", "Operación completa", MessageBoxButton.OK, MessageBoxImage.Information);
+                long elapsedTime = Matrix.multiplicationSequential(path1, path2, path_result, rows, columns, separator);
+                MessageBox.Show(string.Format("Se ha concluido la operación en {0} milisegundos.",elapsedTime), "Operación completa", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {

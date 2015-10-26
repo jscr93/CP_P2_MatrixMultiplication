@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using System.Diagnostics;
 
 namespace CP_P2_MatrixMultiplication
 {
@@ -37,8 +38,10 @@ namespace CP_P2_MatrixMultiplication
         }
 
 
-        public static void multiplicationSequential(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator)
+        public static long multiplicationSequential(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             string m1_path = path1;
             string m2_path = transpose(path2, columns_m1, rows_m1, separator);
 
@@ -75,6 +78,8 @@ namespace CP_P2_MatrixMultiplication
                 }
             }
             File.Delete(m2_path);
+            stopwatch.Stop();
+            return stopwatch.ElapsedMilliseconds;
         }
 
         private class RowResult
@@ -86,8 +91,10 @@ namespace CP_P2_MatrixMultiplication
         private static readonly object syncLock = new object();
         private static List<RowResult> MatrixResult;
 
-        public static void multiplicationParallel(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator)
+        public static long multiplicationParallel(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator)
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             File.Delete(path_result);
             string m1_path = path1;
             string m2_path = transpose(path2, columns_m1, rows_m1, separator);
@@ -96,7 +103,7 @@ namespace CP_P2_MatrixMultiplication
             for( int i = 0; i < rows_m1; i++)
             {
                 int a = i;
-                mTasks[a] = new Task(() => executeRowMultiplication(m1_path, m2_path, path_result, rows_m1, columns_m1, separator, a));
+                mTasks[a] = new Task(() => executeRowMultiplication(m1_path, m2_path, rows_m1, columns_m1, separator, a));
             }
 
             foreach (Task t in mTasks)
@@ -114,10 +121,11 @@ namespace CP_P2_MatrixMultiplication
                 }
             }
             File.Delete(m2_path);
-            //string line = File.ReadLines(path1).Skip(2).Take(1).First();
+            stopwatch.Stop();
+            return stopwatch.ElapsedMilliseconds;
         }
 
-        private static void executeRowMultiplication(string path1, string path2, string path_result, long rows_m1, long columns_m1, char separator, int rowIndex_m1)
+        private static void executeRowMultiplication(string path1, string path2, long rows_m1, long columns_m1, char separator, int rowIndex_m1)
         {
             RowResult rowResult = new RowResult();
             string matrix1_row = File.ReadLines(path1).Skip(rowIndex_m1).Take(1).First();
